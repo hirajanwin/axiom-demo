@@ -1,0 +1,45 @@
+version: '3.2'
+
+volumes:
+  postgres_data:
+  minio_data:
+
+services:
+  postgres: 
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: axiom
+      POSTGRES_PASSWORD: axiom
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ACCESS_KEY: axiom
+      MINIO_SECRET_KEY: axiomoixa
+      MINIO_BROWSER: "on"
+    entrypoint: sh
+    command: -c 'mkdir -p /data/axiomdb && /usr/bin/minio server /data'
+    ports:
+      - 9000:9000
+    volumes:
+      - minio_data:/data
+  axiomdb:
+    image: axiomhq/axiomdb:1.3.0-rc.9
+    environment:
+      AXIOM_POSTGRES_URL: "postgres://axiom:axiom@postgres?sslmode=disable&connect_timeout=5"
+      AXIOM_STORAGE: "minio://minio:9000/axiomdb/data?key=axiom&secret=axiomoixa&secure=false"
+    depends_on:
+      - minio
+      - postgres
+    restart: unless-stopped
+  axiom-core:
+    image: axiomhq/axiom-core:1.3.0-rc.9
+    environment:
+      AXIOM_POSTGRES_URL: "postgres://axiom:axiom@postgres?sslmode=disable&connect_timeout=5"
+      AXIOM_DB_URL: "http://axiomdb"
+    ports:
+      - 8080:80
+    depends_on:
+      - axiomdb
+    restart: unless-stopped
