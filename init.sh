@@ -20,10 +20,18 @@ done
 sleep 0.5 # Wait another half second to make sure the HTTP server is ready
 
 log "Initializing deployment"
-curl -s -X POST \
+INIT_ERROR=$(curl -s -X POST \
 	-H 'Content-Type: application/json' \
 	--data '{"org":"Demo","name":"Demo User","email":"demo@axiom.co","password":"axiom-d3m0"}' \
-	"${DEPLOYMENT_URL}/auth/init"
+	"${DEPLOYMENT_URL}/auth/init" | jq -r .error)
+# INIT_ERROR is one of
+# * `null` if no JSON is returned
+# * `` if JSON is returned but no error field (or empty)
+# * `<error>` if an error is returned
+if [ "${INIT_ERROR}" != "" ] && [ "${INIT_ERROR}" != "null" ]; then
+	log "Could not initialize deployment (already set up?): ${INIT_ERROR}"
+	exit 1
+fi
 
 log "Login and get session"
 SESSION=$(curl -s -c - -X POST \
