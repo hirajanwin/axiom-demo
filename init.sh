@@ -2,9 +2,7 @@
 
 set -exuf
 
-HOSTNAME=axiom-core
-PORT=80
-DEPLOYMENT_URL="http://${HOSTNAME}:${PORT}"
+DEPLOYMENT_URL="http://axiom-core:80"
 
 log() {
     echo "$@" >&2
@@ -13,18 +11,17 @@ log() {
 log "Installing dependencies"
 apk add --no-cache curl jq
 
-echo "Waiting for ${HOSTNAME}:${PORT} to be up"
-while ! nc -z "${HOSTNAME}" "${PORT}"; do
+echo "Waiting for ${DEPLOYMENT_URL} to be up"
+while ! curl -s "${DEPLOYMENT_URL}"; do
   sleep 0.1
 done
 
-sleep 0.5 # Wait another half second to make sure the HTTP server is ready
-
 log "Initializing deployment"
-INIT_ERROR=$(curl -s -X POST \
+INIT_RES=$(curl -s -X POST \
 	-H 'Content-Type: application/json' \
 	--data '{"org":"Demo","name":"Demo User","email":"demo@axiom.co","password":"axiom-d3m0"}' \
-	"${DEPLOYMENT_URL}/auth/init" | jq -r .error)
+	"${DEPLOYMENT_URL}/auth/init")
+INIT_ERROR=$(echo "${INIT_RES}" | jq -r .error)
 # INIT_ERROR is one of
 # * `null` if no JSON is returned
 # * `` if JSON is returned but no error field (or empty)
@@ -35,24 +32,26 @@ if [ "${INIT_ERROR}" != "" ] && [ "${INIT_ERROR}" != "null" ]; then
 fi
 
 log "Login and get session"
-SESSION=$(curl -s -c - -X POST \
+SESSION_RES=$(curl -s -c - -X POST \
 	-H 'Content-Type: application/json' \
 	--data '{"email":"demo@axiom.co","password":"axiom-d3m0"}' \
-	"${DEPLOYMENT_URL}/auth/signin/credentials" \
-	| grep axiom.sid \
-	| awk '{ print $7 }')
+	"${DEPLOYMENT_URL}/auth/signin/credentials")
+SESSION=$(echo "${SESSION_RES}" | grep axiom.sid | awk '{ print $7 }')
 
 log "Create personal access token"
-PERSONAL_ACCESS_TOKEN_ID=$(curl -s -X POST \
+PERSONAL_ACCESS_TOKEN_ID_RES=$(curl -s -X POST \
 	-H 'Content-Type: application/json' \
+	-H 'X-Axiom-Org-ID: axiom' \
 	--cookie "axiom.sid=${SESSION}" \
 	--data '{"id":"new","name":"Demo","description":"This is the token automatically created by init.sh","scopes":[]}' \
-	"${DEPLOYMENT_URL}/api/v1/tokens/personal" | jq -r .id)
+	"${DEPLOYMENT_URL}/api/v1/tokens/personal")
+PERSONAL_ACCESS_TOKEN_ID=$(echo "${PERSONAL_ACCESS_TOKEN_ID_RES}"| jq -r .id)
 
 log "Get personal access token"
-AXIOM_ACCESS_TOKEN=$(curl -s \
+AXIOM_ACCESS_TOKEN_RES=$(curl -s \
 	--cookie "axiom.sid=${SESSION}" \
-	"${DEPLOYMENT_URL}/api/v1/tokens/personal/${PERSONAL_ACCESS_TOKEN_ID}/token" | jq -r .token)
+	"${DEPLOYMENT_URL}/api/v1/tokens/personal/${PERSONAL_ACCESS_TOKEN_ID}/token")
+AXIOM_ACCESS_TOKEN=$(echo "${AXIOM_ACCESS_TOKEN_RES}" | jq -r .token)
 
 log "Logout"
 curl -s --cookie "axiom.sid=${SESSION}" "${DEPLOYMENT_URL}/logout"
