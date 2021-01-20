@@ -47,4 +47,4 @@ services:
     image: alpine:3
     volumes:
       - ./init.sh:/usr/bin/init
-    command: apk add --no-cache curl && /usr/bin/init
+    command: sh -c 'apk add --no-cache curl jq && /usr/bin/init'

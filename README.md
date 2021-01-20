@@ -1,4 +1,4 @@
-# axiom-demo
+# axiom-demo [![Build](https://github.com/axiomhq/axiom-demo/workflows/Build/badge.svg)](https://github.com/axiomhq/axiom-demo/actions?query=workflow%3ABuild)
 
 This repo contains a ready-to-go demo to try Axiom locally.
 
