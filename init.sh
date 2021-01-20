@@ -1,8 +1,6 @@
 #!/bin/sh
 
-# This script requires curl and jq to be installed.
-
-set -euf
+set -exuf
 
 HOSTNAME=axiom-core
 PORT=80
@@ -11,6 +9,9 @@ DEPLOYMENT_URL="http://${HOSTNAME}:${PORT}"
 log() {
     echo "$@" >&2
 }
+
+log "Installing dependencies"
+apk add --no-cache curl jq
 
 echo "Waiting for ${HOSTNAME}:${PORT} to be up"
 while ! nc -z "${HOSTNAME}" "${PORT}"; do
@@ -49,11 +50,16 @@ PERSONAL_ACCESS_TOKEN_ID=$(curl -s -X POST \
 	"${DEPLOYMENT_URL}/api/v1/tokens/personal" | jq -r .id)
 
 log "Get personal access token"
-PERSONAL_ACCESS_TOKEN=$(curl -s \
+AXIOM_ACCESS_TOKEN=$(curl -s \
 	--cookie "axiom.sid=${SESSION}" \
 	"${DEPLOYMENT_URL}/api/v1/tokens/personal/${PERSONAL_ACCESS_TOKEN_ID}/token" | jq -r .token)
 
 log "Logout"
 curl -s --cookie "axiom.sid=${SESSION}" "${DEPLOYMENT_URL}/logout"
 
-echo "${PERSONAL_ACCESS_TOKEN}"
+log "Creating dataset"
+curl -s -X POST \
+	-H 'Content-Type: application/json' \
+	-H "Authorization: Bearer ${AXIOM_ACCESS_TOKEN}" \
+	--data '{"name":"Postgres","description":"Postgres logs"}' \
+	"${DEPLOYMENT_URL}/api/v1/datasets"
