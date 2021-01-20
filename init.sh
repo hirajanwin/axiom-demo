@@ -2,6 +2,8 @@
 
 # This script requires curl and jq to be installed.
 
+set -euf
+
 HOSTNAME=axiom-core
 PORT=80
 DEPLOYMENT_URL="http://${HOSTNAME}:${PORT}"
@@ -15,11 +17,13 @@ while ! nc -z "${HOSTNAME}" "${PORT}"; do
   sleep 0.1
 done
 
+sleep 0.5 # Wait another half second to make sure the HTTP server is ready
+
 log "Initializing deployment"
 curl -s -X POST \
 	-H 'Content-Type: application/json' \
 	--data '{"org":"Demo","name":"Demo User","email":"demo@axiom.co","password":"axiom-d3m0"}' \
-	"${DEPLOYMENT_URL}/auth/init" > /dev/null
+	"${DEPLOYMENT_URL}/auth/init"
 
 log "Login and get session"
 SESSION=$(curl -s -c - -X POST \
@@ -42,7 +46,6 @@ PERSONAL_ACCESS_TOKEN=$(curl -s \
 	"${DEPLOYMENT_URL}/api/v1/tokens/personal/${PERSONAL_ACCESS_TOKEN_ID}/token" | jq -r .token)
 
 log "Logout"
-curl -s --cookie "axiom.sid=${SESSION}" \
-	"${DEPLOYMENT_URL}/logout"
+curl -s --cookie "axiom.sid=${SESSION}" "${DEPLOYMENT_URL}/logout"
 
 echo "${PERSONAL_ACCESS_TOKEN}"
