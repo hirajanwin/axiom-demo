@@ -11,5 +11,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run ShellCheck
-        run: shellcheck --enable=all init.sh
+        run: shellcheck --enable=all ./**/*.sh
 

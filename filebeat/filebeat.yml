@@ -1,0 +1,16 @@
+setup.ilm.enabled: false
+
+filebeat.inputs:
+  - type: log
+    paths:
+      - /usr/share/log/postgres.log
+    multiline:
+      pattern: '^[-0-9]* '
+      negate: true
+      match: after
+
+output.elasticsearch:
+  hosts: 
+    - http://axiom-core:80/api/v1/datasets/postgres/elastic
+  headers:
+    Authorization: "Bearer ${PERSONAL_ACCESS_TOKEN:?You need to set the PERSONAL_ACCESS_TOKEN environment variable}"

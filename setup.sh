@@ -31,27 +31,27 @@ if [ "${INIT_ERROR}" != "" ] && [ "${INIT_ERROR}" != "null" ]; then
 	exit 1
 fi
 
-log "Login and get session"
+log "Logging int and getting session"
 SESSION_RES=$(curl -s -c - -X POST \
 	-H 'Content-Type: application/json' \
 	--data '{"email":"demo@axiom.co","password":"axiom-d3m0"}' \
 	"${DEPLOYMENT_URL}/auth/signin/credentials")
 SESSION=$(echo "${SESSION_RES}" | grep axiom.sid | awk '{ print $7 }')
 
-log "Create personal access token"
+log "Creating access token"
 PERSONAL_ACCESS_TOKEN_ID_RES=$(curl -s -X POST \
 	-H 'Content-Type: application/json' \
 	-H 'X-Axiom-Org-ID: axiom' \
 	--cookie "axiom.sid=${SESSION}" \
-	--data '{"id":"new","name":"Demo","description":"This is the token automatically created by init.sh","scopes":[]}' \
+	--data '{"id":"new","name":"Demo","description":"This is the token automatically created by axiom-demo","scopes":[]}' \
 	"${DEPLOYMENT_URL}/api/v1/tokens/personal")
 PERSONAL_ACCESS_TOKEN_ID=$(echo "${PERSONAL_ACCESS_TOKEN_ID_RES}"| jq -r .id)
 
-log "Get personal access token"
-AXIOM_ACCESS_TOKEN_RES=$(curl -s \
+log "Getting access token"
+PERSONAL_ACCESS_TOKEN_RES=$(curl -s \
 	--cookie "axiom.sid=${SESSION}" \
 	"${DEPLOYMENT_URL}/api/v1/tokens/personal/${PERSONAL_ACCESS_TOKEN_ID}/token")
-AXIOM_ACCESS_TOKEN=$(echo "${AXIOM_ACCESS_TOKEN_RES}" | jq -r .token)
+PERSONAL_ACCESS_TOKEN=$(echo "${PERSONAL_ACCESS_TOKEN_RES}" | jq -r .token)
 
 log "Logout"
 curl -s --cookie "axiom.sid=${SESSION}" "${DEPLOYMENT_URL}/logout"
@@ -59,6 +59,9 @@ curl -s --cookie "axiom.sid=${SESSION}" "${DEPLOYMENT_URL}/logout"
 log "Creating dataset"
 curl -s -X POST \
 	-H 'Content-Type: application/json' \
-	-H "Authorization: Bearer ${AXIOM_ACCESS_TOKEN}" \
+	-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
 	--data '{"name":"Postgres","description":"Postgres logs"}' \
 	"${DEPLOYMENT_URL}/api/v1/datasets"
+
+log "Writing access token to secrets"
+echo "${PERSONAL_ACCESS_TOKEN}" > /usr/share/secrets/PERSONAL_ACCESS_TOKEN

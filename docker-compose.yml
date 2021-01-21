@@ -3,6 +3,8 @@ version: '3.2'
 volumes:
   postgres_data:
   minio_data:
+  secrets:
+  logs:
 
 services:
   postgres: 
@@ -12,6 +14,10 @@ services:
       POSTGRES_PASSWORD: axiom
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - logs:/usr/share/log
+      - ./postgres/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
+    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
+    command: ["postgres", "-c", "logging_collector=on", "-c", "log_directory=/usr/share/log/", "-c", "log_filename=postgres.log"]
   minio:
     image: minio/minio
     environment:
@@ -43,8 +49,18 @@ services:
     depends_on:
       - axiom-db
     restart: unless-stopped
-  init-script:
+  setup:
     image: alpine:3
     volumes:
-      - ./init.sh:/usr/bin/init
-    command: ["/usr/bin/init"]
+      - ./setup.sh:/usr/bin/setup
+      - secrets:/usr/share/secrets
+    command: ["/usr/bin/setup"]
+  filebeat:
+    image: docker.elastic.co/beats/filebeat-oss:7.10.2
+    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
+    command: ["-environment", "container"]
+    volumes:
+      - secrets:/usr/share/secrets
+      - logs:/usr/share/log:ro
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
