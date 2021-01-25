@@ -25,11 +25,12 @@ services:
       MINIO_SECRET_KEY: axiomoixa
       MINIO_BROWSER: "on"
     entrypoint: sh
-    command: -c 'mkdir -p /data/axiomdb && /usr/bin/minio server /data'
+    command: -c 'mkdir -p /data/axiomdb && touch /usr/share/log/minio.log && /usr/bin/minio server --json /data | tee /usr/share/log/minio.log'
     ports:
       - 9000:9000
     volumes:
       - minio_data:/data
+      - logs:/usr/share/log
   axiom-db:
     image: axiomhq/axiom-db:1.3.0-rc.9
     environment:
@@ -64,6 +65,7 @@ services:
       - logs:/usr/share/log:ro
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - ./filebeat/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
+    restart: unless-stopped
   metricbeat:
     image: docker.elastic.co/beats/metricbeat-oss:7.10.2
     entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
@@ -74,3 +76,40 @@ services:
       - secrets:/usr/share/secrets
       - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
       - ./metricbeat/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
+  axiom-cli-minio-logs:
+    image: axiomhq/cli:0.1.5
+    environment:
+      AXM_URL: http://axiom-core
+    command: sh -c 'tail -f /usr/share/log/minio.log | axiom ingest minio-logs --flush-every 1s'
+    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
+    volumes:
+      - secrets:/usr/share/secrets
+      - logs:/usr/share/log:ro
+      - ./axiom-cli/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
+    restart: unless-stopped
+  minio-traces:
+    image: minio/mc
+    environment:
+      MINIO_ACCESS_KEY: axiom
+      MINIO_SECRET_KEY: axiomoixa
+      MINIO_HOST: http://minio:9000
+    entrypoint: ["/usr/bin/sh"]
+    command: > 
+      -c "microdnf install jq &&
+      mc alias set minio $$MINIO_HOST $$MINIO_ACCESS_KEY $$MINIO_SECRET_KEY && 
+      touch /usr/share/log/minio-traces.log && 
+      mc admin trace minio --json -q | jq '.' --unbuffered -c > /usr/share/log/minio-traces.log"
+    volumes:
+      - logs:/usr/share/log
+    restart: unless-stopped
+  axiom-cli-minio-traces:
+    image: axiomhq/cli:0.1.5
+    environment:
+      AXM_URL: http://axiom-core
+    command: sh -c 'tail -f /usr/share/log/minio-traces.log | axiom ingest minio-traces --flush-every 1s'
+    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
+    volumes:
+      - secrets:/usr/share/secrets
+      - logs:/usr/share/log:ro
+      - ./axiom-cli/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
+    restart: unless-stopped
