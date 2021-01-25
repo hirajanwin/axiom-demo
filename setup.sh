@@ -56,11 +56,16 @@ PERSONAL_ACCESS_TOKEN=$(echo "${PERSONAL_ACCESS_TOKEN_RES}" | jq -r .token)
 log "Logout"
 curl -s --cookie "axiom.sid=${SESSION}" "${DEPLOYMENT_URL}/logout"
 
-log "Creating dataset"
+log "Creating datasets"
 curl -s -X POST \
 	-H 'Content-Type: application/json' \
 	-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
-	--data '{"name":"Postgres","description":"Postgres logs"}' \
+	--data '{"name":"Postgres Logs","description":"Logs from your local postgres container"}' \
+	"${DEPLOYMENT_URL}/api/v1/datasets"
+curl -s -X POST \
+	-H 'Content-Type: application/json' \
+	-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+	--data '{"name":"Postgres Metrics","description":"Metrics from your local postgres container"}' \
 	"${DEPLOYMENT_URL}/api/v1/datasets"
 
 log "Writing access token to secrets"

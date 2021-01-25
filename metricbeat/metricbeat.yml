@@ -1,0 +1,18 @@
+setup.ilm.enabled: false
+
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+
+metricbeat.modules:
+- module: postgresql
+  metricsets: 
+    - database
+    - bgwriter
+    - activity
+  hosts: ${POSTGRES_URL}
+
+output.elasticsearch:
+  hosts: 
+    - http://axiom-core:80/api/v1/datasets/postgres-metrics/elastic
+  headers:
+    Authorization: "Bearer ${PERSONAL_ACCESS_TOKEN:?You need to set the PERSONAL_ACCESS_TOKEN environment variable}"

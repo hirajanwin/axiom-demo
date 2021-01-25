@@ -64,3 +64,13 @@ services:
       - logs:/usr/share/log:ro
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - ./filebeat/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat-oss:7.10.2
+    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
+    command: ["-environment", "container"]
+    environment:
+      POSTGRES_URL: "postgres://axiom:axiom@postgres?sslmode=disable&connect_timeout=5"
+    volumes:
+      - secrets:/usr/share/secrets
+      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - ./metricbeat/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
