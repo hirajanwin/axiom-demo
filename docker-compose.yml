@@ -17,7 +17,7 @@ services:
       - logs:/usr/share/log
       - ./postgres/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
     entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
-    command: ["postgres", "-c", "logging_collector=on", "-c", "log_directory=/usr/share/log/", "-c", "log_filename=postgres.log"]
+    command: ["postgres", "-c", "logging_collector=on", "-c", "log_statement=all", "-c", "log_directory=/usr/share/log/", "-c", "log_filename=postgres.log"]
   minio:
     image: minio/minio
     environment:
