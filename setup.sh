@@ -134,6 +134,7 @@ main () {
 
 	log "Creating dashboards"
 	create_dashboard "minio.json"
+	create_dashboard "postgres.json"
 }
 
 main # call main function

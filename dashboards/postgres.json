@@ -1,0 +1,89 @@
+{
+  "name": "Postgres",
+  "description": "Insights into your local postgres container.",
+  "charts": [
+    {
+      "id": "a2c98cec-0d75-44ce-860f-dc7054116cfa",
+      "name": "Errors",
+      "type": "Statistic",
+      "datasetId": "postgres-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "count",
+            "field": ""
+          }
+        ],
+        "filter": {
+          "field": "message",
+          "op": "contains",
+          "value": "ERROR:",
+          "caseSensitive": true
+        },
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "true"
+        }
+      },
+      "colorScheme": "Red",
+      "showChart": true,
+      "modified": 1611667199364
+    },
+    {
+      "id": "b91e9d56-72e1-473b-8071-6992f3c7c305",
+      "name": "Queries",
+      "type": "TimeSeries",
+      "datasetId": "postgres-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "count",
+            "field": ""
+          }
+        ],
+        "filter": {
+          "field": "message",
+          "op": "contains",
+          "value": "LOG:  statement:"
+        },
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "modified": 1611667279490
+    }
+  ],
+  "owner": "$DASHBOARD_OWNER",
+  "layout": [
+    {
+      "w": 4,
+      "h": 4,
+      "x": 0,
+      "y": 4,
+      "i": "a2c98cec-0d75-44ce-860f-dc7054116cfa",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 12,
+      "h": 4,
+      "x": 0,
+      "y": 0,
+      "i": "b91e9d56-72e1-473b-8071-6992f3c7c305",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    }
+  ],
+  "refreshTime": 15,
+  "schemaVersion": 2,
+  "timeWindowStart": "qr-now-30m",
+  "timeWindowEnd": "qr-now",
+  "version": "1611667031647565100"
+}
