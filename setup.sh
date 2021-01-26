@@ -14,6 +14,19 @@ log () {
     echo "$@" >&2
 }
 
+# $1 = name
+# $2 = alias
+# $3 = description
+# $4 = dataset
+# $5 = expression
+create_vfield () {
+	curl -s -X POST \
+		-H 'Content-Type: application/json' \
+		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+		--data "{\"name\":\"$1\",\"alias\":\"$2\",\"description\":\"$3\",\"dataset\":\"$4\",\"expression\":\"$4\"}" \
+		"${AXIOM_DEPLOYMENT_URL}/api/v1/vfields"
+}
+
 # Create a dataset
 # $1 = dataset name
 # $2 = description
@@ -135,6 +148,9 @@ main () {
 	log "Creating dashboards"
 	create_dashboard "minio.json"
 	create_dashboard "postgres.json"
+
+	log "Creating virtual fields"
+	create_vfield "statement" "statement" "Extract the sql statement from a log line" "postgres-logs" 'extract("(?s)LOG:[\\\\s]+statement:[\\\\s]+(.+)", 1, message)'
 }
 
 main # call main function

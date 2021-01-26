@@ -54,15 +54,42 @@
         }
       },
       "modified": 1611667279490
+    },
+    {
+      "id": "ba6b9afc-9f4e-49aa-93ea-1c6b932ad932",
+      "name": "Most run queries",
+      "type": "TimeSeries",
+      "datasetId": "postgres-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "topk",
+            "field": "statement",
+            "argument": 10
+          }
+        ],
+        "virtualFields": [
+          {
+            "alias": "statement",
+            "expr": "extract(\"(?s)LOG:[\\\\s]+statement:[\\\\s]+(.+)\", 1, message)"
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "modified": 1611674496477
     }
   ],
   "owner": "$DASHBOARD_OWNER",
   "layout": [
     {
       "w": 4,
-      "h": 4,
+      "h": 5,
       "x": 0,
-      "y": 4,
+      "y": 5,
       "i": "a2c98cec-0d75-44ce-860f-dc7054116cfa",
       "minW": 4,
       "minH": 4,
@@ -71,10 +98,21 @@
     },
     {
       "w": 12,
-      "h": 4,
+      "h": 5,
       "x": 0,
       "y": 0,
       "i": "b91e9d56-72e1-473b-8071-6992f3c7c305",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 8,
+      "h": 5,
+      "x": 4,
+      "y": 5,
+      "i": "ba6b9afc-9f4e-49aa-93ea-1c6b932ad932",
       "minW": 4,
       "minH": 4,
       "moved": false,
@@ -85,5 +123,5 @@
   "schemaVersion": 2,
   "timeWindowStart": "qr-now-30m",
   "timeWindowEnd": "qr-now",
-  "version": "1611667031647565100"
+  "version": "1611673479019683500"
 }
