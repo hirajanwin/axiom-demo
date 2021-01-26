@@ -99,8 +99,6 @@ main () {
 	create_dataset "postgres-metrics" "Metrics from your local postgres container"
 	create_dataset "minio-logs" "Logs from your local minio container"
 	create_dataset "minio-traces" "Traces from your local minio container"
-
-	echo "${PERSONAL_ACCESS_TOKEN}" > /usr/share/secrets/PERSONAL_ACCESS_TOKEN
 }
 
 main # call main function

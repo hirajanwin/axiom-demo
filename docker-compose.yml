@@ -3,7 +3,6 @@ version: '3.2'
 volumes:
   postgres_data:
   minio_data:
-  secrets:
   logs:
 
 services:
@@ -34,7 +33,6 @@ services:
       POSTGRES_URL: "postgres://axiom:axiom@postgres?sslmode=disable&connect_timeout=5"
     volumes:
       - ./setup.sh:/usr/bin/setup
-      - secrets:/usr/share/secrets
     command: ["/usr/bin/setup"]
 
   # Postgres container + filebeat for logs + metricbeat for metrics
@@ -51,24 +49,21 @@ services:
     command: ["postgres", "-c", "logging_collector=on", "-c", "log_statement=all", "-c", "log_directory=/usr/share/log/", "-c", "log_filename=postgres.log"]
   filebeat:
     image: docker.elastic.co/beats/filebeat-oss:7.10.2
-    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
     command: ["-environment", "container"]
+    environment:
+      PERSONAL_ACCESS_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
     volumes:
-      - secrets:/usr/share/secrets
       - logs:/usr/share/log:ro
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - ./filebeat/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
     restart: unless-stopped
   metricbeat:
     image: docker.elastic.co/beats/metricbeat-oss:7.10.2
-    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
     command: ["-environment", "container"]
     environment:
+      PERSONAL_ACCESS_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
       POSTGRES_URL: "postgres://axiom:axiom@postgres?sslmode=disable&connect_timeout=5"
     volumes:
-      - secrets:/usr/share/secrets
       - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
-      - ./metricbeat/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
 
   # Minio container + tracer + axiom cli ingestors
   minio:
@@ -88,12 +83,11 @@ services:
     image: axiomhq/cli:0.1.5
     environment:
       AXM_URL: http://axiom-core
-    command: sh -c 'tail -f /usr/share/log/minio.log | axiom ingest minio-logs --flush-every 1s'
-    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
+      AXM_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
+    entrypoint: ['sh']
+    command: -c 'tail -f /usr/share/log/minio.log | axiom ingest minio-logs --flush-every 1s'
     volumes:
-      - secrets:/usr/share/secrets
       - logs:/usr/share/log:ro
-      - ./axiom-cli/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
     restart: unless-stopped
   minio-traces:
     image: minio/mc
@@ -114,10 +108,9 @@ services:
     image: axiomhq/cli:0.1.5
     environment:
       AXM_URL: http://axiom-core
-    command: sh -c 'tail -f /usr/share/log/minio-traces.log | axiom ingest minio-traces --flush-every 1s'
-    entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
+      AXM_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
+    entrypoint: ['sh']
+    command: -c 'tail -f /usr/share/log/minio-traces.log | axiom ingest minio-traces --flush-every 1s'
     volumes:
-      - secrets:/usr/share/secrets
       - logs:/usr/share/log:ro
-      - ./axiom-cli/entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh
     restart: unless-stopped
