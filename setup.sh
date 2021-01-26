@@ -93,6 +93,17 @@ create_dashboard() {
 	# Get dashboard payload and replace owner var
 	DASHBOARD_PAYLOAD=$(sed "s/\$DASHBOARD_OWNER/${DASHBOARD_OWNER}/g" < "/usr/share/dashboards/${1}")
 
+	# Check if we already have a dashboard with the same name
+	DASHBOARD_NAME=$(echo "${DASHBOARD_PAYLOAD}" | jq -r .name)
+	DASHBOARDS_RES=$(curl -s \
+		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+		"${AXIOM_DEPLOYMENT_URL}/api/v1/dashboards")
+	DASHBOARD_EXISTS=$(echo "${DASHBOARDS_RES}" | jq -r --arg name "${DASHBOARD_NAME}" '.[] | select(.name == $name).name')
+	if [ -n "${DASHBOARD_EXISTS}" ]; then
+		return # Dashboard with this name already exists, skip
+	fi
+
+	# Create dashboard
 	curl -s -X POST \
 		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
 		-H 'Content-Type: application/json' \
