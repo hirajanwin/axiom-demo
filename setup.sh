@@ -7,6 +7,7 @@ AXIOM_DEPLOYMENT_URL="http://axiom-core:80"
 AXIOM_USER="demo@axiom.co"
 AXIOM_PASSWORD="axiom-d3m0"
 PERSONAL_ACCESS_TOKEN="274dc2a2-5db4-4f8c-92a3-92e33bee92a8"
+DASHBOARD_OWNER="" # Set by first call to create_dashboard
 
 # Log to stderr
 log () {
@@ -79,6 +80,25 @@ create_personal_access_token () {
 	curl -s --cookie "axiom.sid=${SESSION}" "${AXIOM_DEPLOYMENT_URL}/logout"
 }
 
+# $1 = name
+# $2 = description
+# $3 = file in dashboards/
+create_dashboard() {
+	# Get dashboard owner once
+	if [ -z "${DASHBOARD_OWNER}" ]; then
+		DASHBOARD_OWNER_RES=$(curl -s \
+			-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+			"${AXIOM_DEPLOYMENT_URL}/api/v1/user")
+		DASHBOARD_OWNER=$(echo "${DASHBOARD_OWNER_RES}" | jq -r .id)
+	fi
+
+	curl -s -X POST \
+		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+		-H 'Content-Type: application/json' \
+		--data "{\"name\":\"${1}\",\"description\":\"${2}\",\"charts\":[],\"owner\":\"${DASHBOARD_OWNER}\",\"layout\":[],\"refreshTime\":15,\"schemaVersion\":2,\"timeWindowStart\":\"qr-now-30m\",\"timeWindowEnd\":\"qr-now\"}" \
+		"${AXIOM_DEPLOYMENT_URL}/api/v1/dashboards"
+}
+
 main () {
 	log "Installing dependencies"
 	apk add --no-cache curl jq postgresql-client
@@ -99,6 +119,10 @@ main () {
 	create_dataset "postgres-metrics" "Metrics from your local postgres container"
 	create_dataset "minio-logs" "Logs from your local minio container"
 	create_dataset "minio-traces" "Traces from your local minio container"
+
+	log "Creating dashboards"
+	create_dashboard "Postgres" "Insights into your local postgres container" "postgres.json"
+	create_dashboard "Minio" "Insights into your local minio container" "postgres.json"
 }
 
 main # call main function
