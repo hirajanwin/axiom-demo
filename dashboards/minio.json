@@ -26,7 +26,7 @@
     },
     {
       "id": "69ece7ca-d772-4bd5-a62d-7697911a3a00",
-      "name": "Queries over time",
+      "name": "Requests",
       "type": "TimeSeries",
       "datasetId": "minio-traces",
       "query": {
@@ -143,7 +143,7 @@
       "w": 4,
       "h": 4,
       "x": 0,
-      "y": 4,
+      "y": 5,
       "i": "59b18a6a-97f6-44a1-bd80-6b2efcf4eada",
       "minW": 4,
       "minH": 4,
@@ -152,7 +152,7 @@
     },
     {
       "w": 12,
-      "h": 4,
+      "h": 5,
       "x": 0,
       "y": 0,
       "i": "69ece7ca-d772-4bd5-a62d-7697911a3a00",
@@ -165,7 +165,7 @@
       "w": 4,
       "h": 4,
       "x": 4,
-      "y": 4,
+      "y": 5,
       "i": "7a621ffc-7c7f-4dc4-b4b9-758567f7481f",
       "minW": 4,
       "minH": 4,
@@ -176,7 +176,7 @@
       "w": 4,
       "h": 4,
       "x": 8,
-      "y": 4,
+      "y": 5,
       "i": "19221e0f-4f10-4af0-a6c1-c79cedf79f9c",
       "minW": 4,
       "minH": 4,
@@ -187,7 +187,7 @@
       "w": 4,
       "h": 4,
       "x": 0,
-      "y": 8,
+      "y": 9,
       "i": "89024aa3-cdc6-4e14-a1bf-0cff1eac6fd0",
       "minW": 4,
       "minH": 4,
@@ -198,7 +198,7 @@
       "w": 8,
       "h": 4,
       "x": 4,
-      "y": 8,
+      "y": 9,
       "i": "1f8954b1-fc89-487e-afa7-d70a33d13da5",
       "minW": 4,
       "minH": 4,
@@ -210,5 +210,5 @@
   "schemaVersion": 2,
   "timeWindowStart": "qr-now-30m",
   "timeWindowEnd": "qr-now",
-  "version": "1611658046689283800"
+  "version": "1611676469501975400"
 }
