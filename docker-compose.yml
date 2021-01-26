@@ -30,6 +30,8 @@ services:
   # Setup container (will exit after setup)
   setup:
     image: alpine:3
+    environment:
+      POSTGRES_URL: "postgres://axiom:axiom@postgres?sslmode=disable&connect_timeout=5"
     volumes:
       - ./setup.sh:/usr/bin/setup
       - secrets:/usr/share/secrets

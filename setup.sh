@@ -6,7 +6,7 @@ set -exuf
 AXIOM_DEPLOYMENT_URL="http://axiom-core:80"
 AXIOM_USER="demo@axiom.co"
 AXIOM_PASSWORD="axiom-d3m0"
-PERSONAL_ACCESS_TOKEN="" # set by get_personal_access_token
+PERSONAL_ACCESS_TOKEN="274dc2a2-5db4-4f8c-92a3-92e33bee92a8"
 
 # Log to stderr
 log () {
@@ -41,7 +41,7 @@ init_deployment () {
 }
 
 # Log in, create new personal access token, logout
-get_personal_access_token () {
+create_personal_access_token () {
 	TOKEN_NAME="Demo"
 
 	SESSION_RES=$(curl -s -c - -X POST \
@@ -67,17 +67,21 @@ get_personal_access_token () {
 		PERSONAL_ACCESS_TOKEN_ID=$(echo "${PERSONAL_ACCESS_TOKEN_ID_RES}"| jq -r .id)
 	fi
 
-	PERSONAL_ACCESS_TOKEN_RES=$(curl -s \
-		--cookie "axiom.sid=${SESSION}" \
-		"${AXIOM_DEPLOYMENT_URL}/api/v1/tokens/personal/${PERSONAL_ACCESS_TOKEN_ID}/token")
-	PERSONAL_ACCESS_TOKEN=$(echo "${PERSONAL_ACCESS_TOKEN_RES}" | jq -r .token)
+	# Get original personal access token to be able to update it
+        ORIGINAL_PERSONAL_ACCESS_TOKEN_RES=$(curl -s \
+                --cookie "axiom.sid=${SESSION}" \
+                "${AXIOM_DEPLOYMENT_URL}/api/v1/tokens/personal/${PERSONAL_ACCESS_TOKEN_ID}/token")
+        ORIGINAL_PERSONAL_ACCESS_TOKEN=$(echo "${ORIGINAL_PERSONAL_ACCESS_TOKEN_RES}" | jq -r .token)
+
+	# Update token in database to make sure it's always the same
+	psql -c "UPDATE axm_ui_auth_authtokens SET entity = entity || '{\"Token\":\"${PERSONAL_ACCESS_TOKEN}\", \"ID\":\"${PERSONAL_ACCESS_TOKEN}\"}', id = '${PERSONAL_ACCESS_TOKEN}' WHERE id = '${ORIGINAL_PERSONAL_ACCESS_TOKEN}';" "${POSTGRES_URL}"
 
 	curl -s --cookie "axiom.sid=${SESSION}" "${AXIOM_DEPLOYMENT_URL}/logout"
 }
 
 main () {
 	log "Installing dependencies"
-	apk add --no-cache curl jq
+	apk add --no-cache curl jq postgresql-client
 
 	log "Waiting for ${AXIOM_DEPLOYMENT_URL} to be reachable"
 	while ! curl -s "${AXIOM_DEPLOYMENT_URL}"; do
@@ -87,8 +91,8 @@ main () {
 	log "Initializing deployment"
 	init_deployment
 
-	log "Getting personal access token"
-	get_personal_access_token
+	log "Creating personal access token"
+	create_personal_access_token
 
 	log "Creating datasets"
 	create_dataset "postgres-logs" "Logs from your local postgres container"
