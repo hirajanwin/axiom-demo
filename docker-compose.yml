@@ -33,6 +33,7 @@ services:
       POSTGRES_URL: "postgres://axiom:axiom@postgres?sslmode=disable&connect_timeout=5"
     volumes:
       - ./setup.sh:/usr/bin/setup
+      - ./dashboards:/usr/share/dashboards
     command: ["/usr/bin/setup"]
 
   # Postgres container + filebeat for logs + metricbeat for metrics

@@ -1,0 +1,214 @@
+{
+  "name": "Minio",
+  "description": "Insights into your local minio container",
+  "charts": [
+    {
+      "id": "59b18a6a-97f6-44a1-bd80-6b2efcf4eada",
+      "name": "Average duration (ns)",
+      "type": "Statistic",
+      "datasetId": "minio-traces",
+      "query": {
+        "aggregations": [
+          {
+            "op": "avg",
+            "field": "callStats.duration"
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "colorScheme": "Blue",
+      "showChart": true,
+      "modified": 1611659705673
+    },
+    {
+      "id": "69ece7ca-d772-4bd5-a62d-7697911a3a00",
+      "name": "Queries over time",
+      "type": "TimeSeries",
+      "datasetId": "minio-traces",
+      "query": {
+        "aggregations": [
+          {
+            "op": "count",
+            "field": ""
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "modified": 1611659723966
+    },
+    {
+      "id": "7a621ffc-7c7f-4dc4-b4b9-758567f7481f",
+      "name": "Upload (bytes)",
+      "type": "Statistic",
+      "datasetId": "minio-traces",
+      "query": {
+        "aggregations": [
+          {
+            "op": "sum",
+            "field": "callStats.tx"
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "colorScheme": "Green",
+      "showChart": true,
+      "modified": 1611659853762
+    },
+    {
+      "id": "19221e0f-4f10-4af0-a6c1-c79cedf79f9c",
+      "name": "Download (bytes)",
+      "type": "Statistic",
+      "datasetId": "minio-traces",
+      "query": {
+        "aggregations": [
+          {
+            "op": "sum",
+            "field": "callStats.rx"
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "colorScheme": "Orange",
+      "showChart": true,
+      "modified": 1611659860041
+    },
+    {
+      "id": "89024aa3-cdc6-4e14-a1bf-0cff1eac6fd0",
+      "name": "Errors",
+      "type": "Statistic",
+      "datasetId": "minio-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "count",
+            "field": ""
+          }
+        ],
+        "filter": {
+          "field": "level",
+          "op": "==",
+          "value": "ERROR"
+        },
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "colorScheme": "Red",
+      "showChart": true,
+      "modified": 1611660033814
+    },
+    {
+      "id": "1f8954b1-fc89-487e-afa7-d70a33d13da5",
+      "name": "Operations",
+      "type": "TimeSeries",
+      "datasetId": "minio-traces",
+      "query": {
+        "aggregations": [
+          {
+            "op": "topk",
+            "field": "api",
+            "argument": 10
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "modified": 1611660127100
+    }
+  ],
+  "owner": "$DASHBOARD_OWNER",
+  "layout": [
+    {
+      "w": 4,
+      "h": 4,
+      "x": 0,
+      "y": 4,
+      "i": "59b18a6a-97f6-44a1-bd80-6b2efcf4eada",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 12,
+      "h": 4,
+      "x": 0,
+      "y": 0,
+      "i": "69ece7ca-d772-4bd5-a62d-7697911a3a00",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 4,
+      "h": 4,
+      "x": 4,
+      "y": 4,
+      "i": "7a621ffc-7c7f-4dc4-b4b9-758567f7481f",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 4,
+      "h": 4,
+      "x": 8,
+      "y": 4,
+      "i": "19221e0f-4f10-4af0-a6c1-c79cedf79f9c",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 4,
+      "h": 4,
+      "x": 0,
+      "y": 8,
+      "i": "89024aa3-cdc6-4e14-a1bf-0cff1eac6fd0",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 8,
+      "h": 4,
+      "x": 4,
+      "y": 8,
+      "i": "1f8954b1-fc89-487e-afa7-d70a33d13da5",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    }
+  ],
+  "refreshTime": 15,
+  "schemaVersion": 2,
+  "timeWindowStart": "qr-now-30m",
+  "timeWindowEnd": "qr-now",
+  "version": "1611658046689283800"
+}

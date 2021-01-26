@@ -80,9 +80,7 @@ create_personal_access_token () {
 	curl -s --cookie "axiom.sid=${SESSION}" "${AXIOM_DEPLOYMENT_URL}/logout"
 }
 
-# $1 = name
-# $2 = description
-# $3 = file in dashboards/
+# $1 = file in dashboards/
 create_dashboard() {
 	# Get dashboard owner once
 	if [ -z "${DASHBOARD_OWNER}" ]; then
@@ -92,10 +90,13 @@ create_dashboard() {
 		DASHBOARD_OWNER=$(echo "${DASHBOARD_OWNER_RES}" | jq -r .id)
 	fi
 
+	# Get dashboard payload and replace owner var
+	DASHBOARD_PAYLOAD=$(sed "s/\$DASHBOARD_OWNER/${DASHBOARD_OWNER}/g" < "/usr/share/dashboards/${1}")
+
 	curl -s -X POST \
 		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
 		-H 'Content-Type: application/json' \
-		--data "{\"name\":\"${1}\",\"description\":\"${2}\",\"charts\":[],\"owner\":\"${DASHBOARD_OWNER}\",\"layout\":[],\"refreshTime\":15,\"schemaVersion\":2,\"timeWindowStart\":\"qr-now-30m\",\"timeWindowEnd\":\"qr-now\"}" \
+		--data "${DASHBOARD_PAYLOAD}" \
 		"${AXIOM_DEPLOYMENT_URL}/api/v1/dashboards"
 }
 
@@ -121,8 +122,7 @@ main () {
 	create_dataset "minio-traces" "Traces from your local minio container"
 
 	log "Creating dashboards"
-	create_dashboard "Postgres" "Insights into your local postgres container" "postgres.json"
-	create_dashboard "Minio" "Insights into your local minio container" "postgres.json"
+	create_dashboard "minio.json"
 }
 
 main # call main function
