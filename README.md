@@ -26,7 +26,8 @@ For api access (i.e. with the cli) there is a personal access token:
 In addition to the frontend you can play around with the 
 [Axiom CLI]. 
 
-### Install
+<details>
+  <summary>Expand for installation instructions</summary>
 
 On macOS/Linux you can use [Homebrew] to install it with:
 
@@ -35,7 +36,8 @@ brew tap axiomhq/tap
 brew install axiom
 ```
 
-See the [CLI installation] docs for more installation methods.
+See the [CLI installation] docs for other installation methods.
+</details>
 
 ### Log in
 
