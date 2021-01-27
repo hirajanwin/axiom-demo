@@ -66,22 +66,9 @@ services:
       MINIO_SECRET_KEY: axiomoixa
       MINIO_BROWSER: "on"
     entrypoint: sh
-    command: -c 'mkdir -p /data/axiomdb && touch /usr/share/log/minio.log && /usr/bin/minio server --json /data | tee /usr/share/log/minio.log'
-    ports:
-      - 9000:9000
+    command: -c 'mkdir -p /data/axiomdb && /usr/bin/minio server --json /data'
     volumes:
       - minio_data:/data
-      - logs:/usr/share/log
-  axiom-cli-minio-logs:
-    image: axiomhq/cli:0.1.5
-    environment:
-      AXM_URL: http://axiom-core
-      AXM_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
-    entrypoint: ['sh']
-    command: -c 'tail -f /usr/share/log/minio.log | axiom ingest minio-logs --flush-every 1s --timestamp-field time'
-    volumes:
-      - logs:/usr/share/log:ro
-    restart: unless-stopped
   minio-traces:
     image: minio/mc
     environment:
