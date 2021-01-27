@@ -12,5 +12,4 @@ filebeat.inputs:
 output.elasticsearch:
   hosts: 
     - http://axiom-core:80/api/v1/datasets/postgres-logs/elastic
-  headers:
-    Authorization: "Bearer ${PERSONAL_ACCESS_TOKEN:?You need to set the PERSONAL_ACCESS_TOKEN environment variable}"
+  api_key: "axiom:${PERSONAL_ACCESS_TOKEN:?You need to set the PERSONAL_ACCESS_TOKEN environment variable}"
