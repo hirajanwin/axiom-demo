@@ -1,0 +1,119 @@
+[
+  {
+    "name": "_time",
+    "class": "time",
+    "rate_s": 10,
+    "forward": true
+  },
+  {
+    "name": "id",
+    "class": "uuid"
+  },
+  {
+    "name": "method",
+    "class": "string",
+    "dist": {
+      "GET": 8,
+      "POST": 5,
+      "PUT": 4,
+      "DELETE": 1
+    }
+  },
+  {
+    "name": "uri",
+    "class": "string",
+    "dist": {
+      "/api/v1/people": 1,
+      "/api/v1/textdata": 3,
+      "/api/v1/messages": 1,
+      "/api/v1/textdata/users": 1,
+      "/api/v1/bank/login": 1,
+      "/api/v1/buy/commit/id/go": 3,
+      "/api/v1/admin/who/now": 1,
+      "/api/v1/cloud/prod/try": 3,
+      "/api/v1/messages/users": 3,
+      "/api/v1/messages/list/id": 2,
+      "/api/v1/messages/back": 3,
+      "/api/v1/textdata/cnfigs": 3,
+      "/api/v1/textdata/background/change": 3,
+      "/api/v1/customer/services": 3,
+      "/api/v1/payment/roll": 2,
+      "/api/v1/bank/warn": 3,
+      "/api/v1/pub/sub/list": 2,
+      "/api/v1/sell/bucket": 1,
+      "/api/v1/purchases/user/id": 3,
+      "/api/v1/ping/user/textdata": 1,
+      "/api/v1/user/notify": 3
+    }
+  },
+  {
+    "name": "content_type",
+    "class": "string",
+    "dist": {
+      "application/octet-stream": 1,
+      "text/plain-charset=utf-8": 3,
+      "text/css": 2,
+      "text/csv": 2,
+      "text/html": 3,
+      "image/gif": 1,
+      "image/jpeg": 3
+    }
+  },
+  {
+    "name": "user_agent",
+    "class": "user-agent"
+  },
+  {
+    "name": "req_duration_ms",
+    "class": "normal",
+    "mean": 0,
+    "sd":  1,
+    "min": 0.1
+  },
+  {
+    "name": "status",
+    "class": "string",
+    "dist": {
+      "200": 5,
+      "201": 4,
+      "301": 1,
+      "500": 1
+    }
+  },
+  {
+    "name": "server_datacenter",
+    "class": "string",
+    "dist": {
+      "ATL": 1,
+      "BWI": 1,
+      "DCA": 1,
+      "FRA": 1,
+      "GRU": 1,
+      "LCY": 1,
+      "SEA": 1,
+      "WDC": 1
+    }
+  },
+  {
+    "name": "resp_header_size_bytes",
+    "class": "int",
+    "min": 10,
+    "max": 99
+  },
+  {
+    "name": "resp_body_size_bytes",
+    "class": "int",
+    "min": 920,
+    "max": 5488
+  },
+  {
+    "name": "is_tls",
+    "class": "bool",
+    "true": 3,
+    "false": 1
+  },
+  {
+    "name": "geo",
+    "class": "country-city"
+  }
+]

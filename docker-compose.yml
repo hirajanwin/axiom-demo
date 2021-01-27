@@ -115,3 +115,16 @@ services:
     volumes:
       - logs:/usr/share/log:ro
     restart: unless-stopped
+
+  # Axisynth
+  axisynth:
+    image: axiomhq/axisynth
+    command: generate --schema /axisynth/schema.json
+    environment:
+      AXISYNTH_DATASET: http-logs
+      AXISYNTH_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
+      AXISYNTH_URL: http://axiom-core
+      AXISYNTH_PARALLEL: 1
+    volumes:
+      - ./axisynth/schema.json:/axisynth/schema.json
+    restart: unless-stopped

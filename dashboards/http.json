@@ -1,0 +1,256 @@
+{
+  "name": "HTTP",
+  "description": "Insights into the generate HTTP logs.",
+  "charts": [
+    {
+      "id": "d13ab62a-5b5f-4f81-b511-278c9553824c",
+      "name": "Requests",
+      "type": "TimeSeries",
+      "datasetId": "http-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "count",
+            "field": ""
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "modified": 1611743360624
+    },
+    {
+      "id": "40383bcb-16ef-4ade-a01e-be9ed2f647e2",
+      "name": "Methods",
+      "type": "TimeSeries",
+      "datasetId": "http-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "topk",
+            "field": "method",
+            "argument": 10
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "modified": 1611743387602
+    },
+    {
+      "id": "2728f327-c656-4a41-b601-ee43dd46ca32",
+      "name": "Average request duration (ms)",
+      "type": "Statistic",
+      "datasetId": "http-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "avg",
+            "field": "req_duration_ms"
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "colorScheme": "Blue",
+      "showChart": true,
+      "modified": 1611744367185
+    },
+    {
+      "id": "604d2ea7-e3d3-4b48-98fd-23cb421371b2",
+      "name": "Status codes",
+      "type": "TimeSeries",
+      "datasetId": "http-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "topk",
+            "field": "status",
+            "argument": 10
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "modified": 1611743622767
+    },
+    {
+      "id": "dc5572e6-2c61-49fb-9a03-ed0cdbb785bb",
+      "name": "URIs",
+      "type": "TimeSeries",
+      "datasetId": "http-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "topk",
+            "field": "uri",
+            "argument": 10
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "modified": 1611743653427
+    },
+    {
+      "id": "7be60c21-1706-43d0-bdd3-628468393f29",
+      "name": "4XX - 5XX responses",
+      "type": "Statistic",
+      "datasetId": "http-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "count",
+            "field": ""
+          }
+        ],
+        "filter": {
+          "op": "or",
+          "field": "",
+          "children": [
+            {
+              "field": "status",
+              "op": "starts-with",
+              "value": "4"
+            },
+            {
+              "field": "status",
+              "op": "starts-with",
+              "value": "5"
+            }
+          ]
+        },
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "colorScheme": "Red",
+      "showChart": true,
+      "modified": 1611743745078
+    },
+    {
+      "id": "f9f79ee6-2f10-4f61-8be4-013a9f8dcd26",
+      "name": "Distinct countries",
+      "type": "Statistic",
+      "datasetId": "http-logs",
+      "query": {
+        "aggregations": [
+          {
+            "op": "distinct",
+            "field": "geo.country"
+          }
+        ],
+        "queryOptions": {
+          "displayNull": "null",
+          "openIntervals": "hidden",
+          "caseSensitive": "false"
+        }
+      },
+      "colorScheme": "Orange",
+      "showChart": true,
+      "modified": 1611744377703
+    }
+  ],
+  "owner": "$DASHBOARD_OWNER",
+  "layout": [
+    {
+      "w": 12,
+      "h": 5,
+      "x": 0,
+      "y": 0,
+      "i": "d13ab62a-5b5f-4f81-b511-278c9553824c",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 6,
+      "h": 5,
+      "x": 0,
+      "y": 5,
+      "i": "40383bcb-16ef-4ade-a01e-be9ed2f647e2",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 4,
+      "h": 4,
+      "x": 0,
+      "y": 10,
+      "i": "2728f327-c656-4a41-b601-ee43dd46ca32",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 6,
+      "h": 5,
+      "x": 6,
+      "y": 5,
+      "i": "604d2ea7-e3d3-4b48-98fd-23cb421371b2",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 12,
+      "h": 5,
+      "x": 0,
+      "y": 14,
+      "i": "dc5572e6-2c61-49fb-9a03-ed0cdbb785bb",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 4,
+      "h": 4,
+      "x": 4,
+      "y": 10,
+      "i": "7be60c21-1706-43d0-bdd3-628468393f29",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 4,
+      "h": 4,
+      "x": 8,
+      "y": 10,
+      "i": "f9f79ee6-2f10-4f61-8be4-013a9f8dcd26",
+      "minW": 4,
+      "minH": 4,
+      "moved": false,
+      "static": false
+    }
+  ],
+  "refreshTime": 15,
+  "schemaVersion": 2,
+  "timeWindowStart": "qr-now-30m",
+  "timeWindowEnd": "qr-now",
+  "version": "1611744308692250500"
+}

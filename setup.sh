@@ -144,10 +144,12 @@ main () {
 	create_dataset "postgres-metrics" "Metrics from your local postgres container"
 	create_dataset "minio-logs" "Logs from your local minio container"
 	create_dataset "minio-traces" "Traces from your local minio container"
+	create_dataset "http-logs" "Generated http logs from axisynth"
 
 	log "Creating dashboards"
 	create_dashboard "minio.json"
 	create_dashboard "postgres.json"
+	create_dashboard "http.json"
 
 	log "Creating virtual fields"
 	create_vfield "statement" "statement" "Extract the sql statement from a log line" "postgres-logs" 'extract("(?s)LOG:[\\\\s]+statement:[\\\\s]+(.+)", 1, message)'
