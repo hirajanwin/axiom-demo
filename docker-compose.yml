@@ -57,14 +57,6 @@ services:
       - logs:/usr/share/log:ro
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
     restart: unless-stopped
-  metricbeat:
-    image: docker.elastic.co/beats/metricbeat-oss:7.10.2
-    command: ["-environment", "container"]
-    environment:
-      PERSONAL_ACCESS_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
-      POSTGRES_URL: "postgres://axiom:axiom@postgres?sslmode=disable&connect_timeout=5"
-    volumes:
-      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
 
   # Minio container + tracer + axiom cli ingestors
   minio:

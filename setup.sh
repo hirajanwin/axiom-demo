@@ -141,7 +141,6 @@ main () {
 
 	log "Creating datasets"
 	create_dataset "postgres-logs" "Logs from your local postgres container"
-	create_dataset "postgres-metrics" "Metrics from your local postgres container"
 	create_dataset "minio-logs" "Logs from your local minio container"
 	create_dataset "minio-traces" "Traces from your local minio container"
 	create_dataset "http-logs" "Generated http logs from axisynth"
