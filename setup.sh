@@ -124,6 +124,25 @@ create_dashboard() {
 		"${AXIOM_DEPLOYMENT_URL}/api/v1/dashboards"
 }
 
+# $1 = name
+# $2 = url
+create_notifier () {
+	# Check if we already have a notifier with the same name
+	NOTIFIERS_RES=$(curl -s \
+		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+		"${AXIOM_DEPLOYMENT_URL}/api/v1/notifiers")
+	NOTIFIER_EXISTS=$(echo "${NOTIFIERS_RES}" | jq -r --arg name "${1}" '.[] | select(.name == $name).name')
+	if [ -n "${NOTIFIER_EXISTS}" ]; then
+		return # Notifer with this name already exists, skip
+	fi
+
+	curl -s -X POST \
+		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+		-H 'Content-Type: application/json' \
+		--data "{\"id\":\"new\",\"name\":\"${1}\",\"properties\":{\"Url\":\"${2}\"},\"type\":\"webhook\"}" \
+		"${AXIOM_DEPLOYMENT_URL}/api/v1/notifiers"
+}
+
 main () {
 	log "Installing dependencies"
 	apk add --no-cache curl jq postgresql-client
@@ -143,6 +162,7 @@ main () {
 	create_dataset "postgres-logs" "Logs from your local postgres container"
 	create_dataset "minio-traces" "Traces from your local minio container"
 	create_dataset "http-logs" "Generated http logs from axisynth"
+	create_dataset "incoming-webhooks" "Webhooks sent to http://ingest-webhook/ are collected here for testing purposes"
 
 	log "Creating dashboards"
 	create_dashboard "minio.json"
@@ -151,6 +171,9 @@ main () {
 
 	log "Creating virtual fields"
 	create_vfield "statement" "statement" "Extract the sql statement from a log line" "postgres-logs" 'extract("(?s)LOG:[\\\\s]+statement:[\\\\s]+(.+)", 1, message)'
+
+	log "Creating incoming-webhooks notifier"
+	create_notifier "incoming-webhooks dataset" "http://ingest-webhook"
 }
 
 main # call main function
