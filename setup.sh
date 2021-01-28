@@ -131,16 +131,43 @@ create_notifier () {
 	NOTIFIERS_RES=$(curl -s \
 		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
 		"${AXIOM_DEPLOYMENT_URL}/api/v1/notifiers")
-	NOTIFIER_EXISTS=$(echo "${NOTIFIERS_RES}" | jq -r --arg name "${1}" '.[] | select(.name == $name).name')
-	if [ -n "${NOTIFIER_EXISTS}" ]; then
-		return # Notifer with this name already exists, skip
+	NOTIFIER_ID=$(echo "${NOTIFIERS_RES}" | jq -r --arg name "${1}" '.[] | select(.name == $name).id')
+	if [ -n "${NOTIFIER_ID}" ]; then
+		# Notifer with this name already exists, skip creation
+		echo "${NOTIFIER_ID}"
+		return
 	fi
 
-	curl -s -X POST \
+	NOTIFIER_RES=$(curl -s -X POST \
 		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
 		-H 'Content-Type: application/json' \
 		--data "{\"id\":\"new\",\"name\":\"${1}\",\"properties\":{\"Url\":\"${2}\"},\"type\":\"webhook\"}" \
-		"${AXIOM_DEPLOYMENT_URL}/api/v1/notifiers"
+		"${AXIOM_DEPLOYMENT_URL}/api/v1/notifiers")
+	echo "${NOTIFIER_RES}" | jq -r .id
+}
+
+# $1 = json payload in monitors/
+# $2 = notifier id
+create_monitor () {
+	# Get monitor and replace $NOTIFIER_ID
+	MONITOR_PAYLOAD=$(sed "s/\$NOTIFIER_ID/${2}/g" < "/usr/share/monitors/${1}")
+
+	# Check if we already have a monitor with the same name
+	MONITOR_NAME=$(echo "${MONITOR_PAYLOAD}" | jq -r .name)
+	MONITOR_RES=$(curl -s \
+		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+		"${AXIOM_DEPLOYMENT_URL}/api/v1/monitors")
+	MONITOR_ID=$(echo "${MONITOR_RES}" | jq -r --arg name "${MONITOR_NAME}" '.[] | select(.name == $name).id')
+	if [ -n "${MONITOR_ID}" ]; then
+		return # Monitor with this name already exists, skip
+	fi
+
+	# Create monitor
+	curl -s -X POST \
+		-H "Authorization: Bearer ${PERSONAL_ACCESS_TOKEN}" \
+		-H 'Content-Type: application/json' \
+		--data "${MONITOR_PAYLOAD}" \
+		"${AXIOM_DEPLOYMENT_URL}/api/v1/monitors"
 }
 
 main () {
@@ -173,7 +200,10 @@ main () {
 	create_vfield "statement" "statement" "Extract the sql statement from a log line" "postgres-logs" 'extract("(?s)LOG:[\\\\s]+statement:[\\\\s]+(.+)", 1, message)'
 
 	log "Creating incoming-webhooks notifier"
-	create_notifier "incoming-webhooks dataset" "http://ingest-webhook"
+	NOTIFIER_ID=$(create_notifier "incoming-webhooks dataset" "http://ingest-webhook")
+
+	log "Create monitor"
+	create_monitor "postgres-errors.json" "${NOTIFIER_ID}" 
 }
 
 main # call main function

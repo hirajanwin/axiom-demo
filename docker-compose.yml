@@ -34,6 +34,7 @@ services:
     volumes:
       - ./setup.sh:/usr/bin/setup
       - ./dashboards:/usr/share/dashboards
+      - ./monitors:/usr/share/monitors
     command: ["/usr/bin/setup"]
 
   # Postgres container + filebeat for logs + metricbeat for metrics

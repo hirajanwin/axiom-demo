@@ -1,0 +1,34 @@
+{
+  "id":"new",
+  "name":"Postgres errors",
+  "description":"Triggers when we have more than one postgres error in the last 5 minutes",
+  "query": {
+    "aggregations": [
+      {
+        "op": "count",
+        "field": "",
+        "argument": null
+      }
+    ],
+    "startTime": "2021-01-28T09:57:48.000Z",
+    "endTime": "2021-01-28T10:02:48.000Z",
+    "filter": {
+      "field": "message",
+      "op": "contains",
+      "value": "ERROR:",
+      "children": null
+    },
+    "queryOptions": {
+      "displayNull": "",
+      "openIntervals": "",
+      "caseSensitive": "false"
+    }
+  },
+  "dataset": "postgres-logs",
+  "threshold": 1,
+  "comparison": "Above",
+  "frequencyMinutes": 1,
+  "durationMinutes": 5,
+  "notifiers": ["$NOTIFIER_ID"],
+  "lastCheckState": {}
+}
