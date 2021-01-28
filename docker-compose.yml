@@ -107,3 +107,15 @@ services:
     volumes:
       - ./axisynth/schema.json:/axisynth/schema.json
     restart: unless-stopped
+
+  ingest-webhook:
+    image: python:3.9-alpine
+    environment:
+      AXM_URL: http://axiom-core
+      AXM_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
+      AXM_DATASET: incoming-webhooks
+    entrypoint: ['sh']
+    volumes: 
+      - ./ingest-webhook:/app
+    command: -c "cd /app && pip install pipenv && pipenv install && pipenv run python3 ingest_webhook.py"
+    restart: unless-stopped
