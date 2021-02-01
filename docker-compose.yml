@@ -50,13 +50,12 @@ services:
     entrypoint: ["/usr/local/bin/docker-entrypoint-override.sh"]
     command: ["postgres", "-c", "logging_collector=on", "-c", "log_statement=all", "-c", "log_directory=/usr/share/log/", "-c", "log_filename=postgres.log"]
   filebeat:
-    image: docker.elastic.co/beats/filebeat-oss:7.10.2
+    build: filebeat
     command: ["-environment", "container"]
     environment:
       PERSONAL_ACCESS_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
     volumes:
       - logs:/usr/share/log:ro
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
     restart: unless-stopped
 
   # Minio container + tracer + axiom cli ingestors
