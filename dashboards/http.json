@@ -24,7 +24,7 @@
     },
     {
       "id": "40383bcb-16ef-4ade-a01e-be9ed2f647e2",
-      "name": "Methods",
+      "name": "Top methods",
       "type": "TimeSeries",
       "datasetId": "http-logs",
       "query": {
@@ -67,7 +67,7 @@
     },
     {
       "id": "604d2ea7-e3d3-4b48-98fd-23cb421371b2",
-      "name": "Status codes",
+      "name": "Top status codes",
       "type": "TimeSeries",
       "datasetId": "http-logs",
       "query": {
@@ -88,7 +88,7 @@
     },
     {
       "id": "dc5572e6-2c61-49fb-9a03-ed0cdbb785bb",
-      "name": "URIs",
+      "name": "Top uris",
       "type": "TimeSeries",
       "datasetId": "http-logs",
       "query": {
