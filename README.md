@@ -1,6 +1,9 @@
 # axiom-demo [![Build](https://github.com/axiomhq/axiom-demo/workflows/Build/badge.svg)](https://github.com/axiomhq/axiom-demo/actions?query=workflow%3ABuild)
 
-This repo contains a ready-to-go demo to try Axiom locally.
+This repo contains a ready-to-go demo to try Axiom locally. It will set up
+an Axiom instance, Postgresql, Minio plus some containers for ingestion.
+The directories in this repository contain configurations for Dashboards, 
+Monitors and ingestion containers.
 
 ## Get started
 
@@ -20,6 +23,9 @@ Password: `axiom-d3m0`
 
 For api access (i.e. with the cli) there is a personal access token: 
 `274dc2a2-5db4-4f8c-92a3-92e33bee92a8`.
+
+See [stopping the stack](#stopping-the-stack) for instructions to tear it down
+again.
 
 ## CLI
 
@@ -62,6 +68,12 @@ axiom dataset stats
 
 # Stream logs into your terminal
 axiom stream postgres-logs
+
+# Create a dataset
+axiom dataset create --name my-dataset --description "My dataset"
+
+# Ingest into a dataset
+axiom ingest my-dataset < file.json
 ```
 
 ## Stopping the stack
