@@ -119,3 +119,9 @@ services:
       - ./ingest-webhook:/app
     command: -c "cd /app && pip install pipenv && pipenv install && pipenv run python3 ingest_webhook.py"
     restart: unless-stopped
+
+  loki-proxy:
+    image: axiomhq/axiom-loki-proxy
+    environment:
+      AXIOM_DEPLOYMENT_URL: http://axiom-core
+      AXIOM_ACCESS_TOKEN: 274dc2a2-5db4-4f8c-92a3-92e33bee92a8
